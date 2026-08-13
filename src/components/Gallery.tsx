@@ -1,159 +1,100 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-const categories = ['All', 'Hair', 'Makeup', 'Spa', 'Nails', 'Bridal', 'Skincare'];
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const images = [
-  { src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=700&q=80', cat: 'Hair', label: 'Silk Blow Out', tall: true },
-  { src: 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=700&q=80', cat: 'Makeup', label: 'Party Glam', tall: false },
-  { src: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=700&q=80', cat: 'Spa', label: 'Hot Stone Massage', tall: true },
-  { src: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=700&q=80', cat: 'Nails', label: 'French Manicure', tall: false },
-  { src: 'https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=700&q=80', cat: 'Bridal', label: 'Bridal Makeup', tall: true },
-  { src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=700&q=80', cat: 'Skincare', label: 'Glow Facial', tall: false },
-  { src: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=700&q=80', cat: 'Hair', label: 'Balayage', tall: false },
-  { src: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=700&q=80', cat: 'Skincare', label: 'HydraFacial', tall: true },
-  { src: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=700&q=80', cat: 'Hair', label: 'Keratin Gloss', tall: false },
-  { src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=700&q=80', cat: 'Spa', label: 'Aromatherapy', tall: true },
-  { src: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=700&q=80', cat: 'Skincare', label: 'Skin Ritual', tall: false },
-  { src: 'https://images.unsplash.com/photo-1559599101-f09722fb4948?w=700&q=80', cat: 'Bridal', label: 'Bridal Party', tall: false },
+  { src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80', cat: 'Hair Studio', label: 'Silk Blow Out', w: 'w-full md:w-[400px]', h: 'h-[60vw] md:h-[500px]', y: 'mt-0' },
+  { src: 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=800&q=80', cat: 'Makeup Pro', label: 'Party Glam', w: 'w-[85%] md:w-[500px]', h: 'h-[50vw] md:h-[400px]', y: 'mt-12 md:mt-40 self-end' },
+  { src: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80', cat: 'Spa & Relax', label: 'Wellness Ritual', w: 'w-[90%] md:w-[350px]', h: 'h-[75vw] md:h-[600px]', y: 'mt-12 md:mt-[-80px] self-start' },
+  { src: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80', cat: 'Nail Art', label: 'French Manicure', w: 'w-[80%] md:w-[450px]', h: 'h-[55vw] md:h-[450px]', y: 'mt-12 md:mt-24 self-end' },
+  { src: 'https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=800&q=80', cat: 'Bridal', label: 'Bridal Elegance', w: 'w-full md:w-[600px]', h: 'h-[70vw] md:h-[700px]', y: 'mt-12 md:mt-[-40px]' },
+  { src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80', cat: 'Skincare', label: 'Glow Facial', w: 'w-[85%] md:w-[400px]', h: 'h-[50vw] md:h-[400px]', y: 'mt-12 md:mt-56 self-start' },
 ];
 
 export default function Gallery() {
-  const [active, setActive] = useState('All');
-  const [lightbox, setLightbox] = useState<null | typeof images[0]>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
 
-  const filtered = active === 'All' ? images : images.filter(i => i.cat === active);
+  useEffect(() => {
+    let ctx = gsap.context(() => {
+      if (!scrollWrapperRef.current || window.innerWidth < 768) return;
+
+      const totalScroll = scrollWrapperRef.current.scrollWidth - window.innerWidth;
+
+      gsap.to(scrollWrapperRef.current, {
+        x: -totalScroll,
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          pin: true,
+          scrub: 1,
+          start: "top top",
+          end: `+=${totalScroll}`,
+        }
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section id="gallery" className="py-24 px-5 lg:px-10" style={{ background: '#FAF8F5' }}>
-      <div className="max-w-7xl mx-auto">
-        {/* Heading */}
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <p className="text-xs font-poppins tracking-[0.35em] uppercase mb-3" style={{ color: '#D4AF37' }}>
-            Inspiration
-          </p>
-          <h2 className="font-playfair text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
-            Beauty <span className="italic text-gradient-gold">Gallery</span>
-          </h2>
-          <div className="w-16 h-px mx-auto" style={{ background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)' }} />
-        </motion.div>
-
-        {/* Category filters */}
-        <motion.div
-          className="flex flex-wrap gap-2 justify-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActive(cat)}
-              className="px-5 py-2 rounded-full text-sm font-poppins font-medium transition-all duration-300"
-              style={
-                active === cat
-                  ? { background: 'linear-gradient(135deg, #D4AF37, #B8962E)', color: 'white', boxShadow: '0 4px 15px rgba(212,175,55,0.3)' }
-                  : { background: 'white', color: '#2C2C2C', border: '1px solid rgba(212,175,55,0.25)' }
-              }
-            >
-              {cat}
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Masonry grid */}
-        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((img, i) => (
-              <motion.div
-                key={img.src + img.cat}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.4, delay: i * 0.04 }}
-                className="relative group rounded-2xl overflow-hidden cursor-zoom-in break-inside-avoid mb-4"
-                onClick={() => setLightbox(img)}
-                style={{ height: img.tall ? 320 : 200 }}
-              >
-                <Image
-                  src={img.src}
-                  alt={img.label}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  quality={75}
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-end p-4">
-                  <div>
-                    <p className="text-white font-poppins font-medium text-sm">{img.label}</p>
-                    <p className="text-white/60 text-xs">{img.cat}</p>
-                  </div>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                    style={{ background: 'rgba(212,175,55,0.85)' }}>
-                    🔍
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+    <section
+      id="gallery"
+      ref={containerRef}
+      className="relative bg-[#1A1A1A] py-32 md:py-0 md:h-screen overflow-hidden flex flex-col justify-center"
+    >
+      <div className="absolute top-12 left-6 md:top-24 md:left-12 z-20 mix-blend-difference pointer-events-none">
+        <p className="text-[10px] md:text-xs font-sans tracking-[0.4em] uppercase text-[#D4AF37] mb-4">
+          Visual Inspiration
+        </p>
+        <h2 className="font-serif text-5xl md:text-7xl font-bold text-[#FAF8F5]">
+          Artistic <span className="italic text-[#FADADD]">Gallery</span>
+        </h2>
       </div>
 
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightbox && (
-          <motion.div
-            className="fixed inset-0 z-[2000] flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setLightbox(null)}
+      <div
+        ref={scrollWrapperRef}
+        className="flex flex-col md:flex-row items-center gap-12 md:gap-24 px-6 md:px-[20vw] h-full w-full md:w-max mt-32 md:mt-0"
+      >
+        {images.map((img, i) => (
+          <div
+            key={i}
+            className={`relative group ${img.w} ${img.h} ${img.y} shrink-0 overflow-hidden cursor-pointer`}
           >
-            <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
-            <motion.div
-              className="relative z-10 max-w-3xl w-full aspect-[4/3] rounded-2xl overflow-hidden"
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              onClick={e => e.stopPropagation()}
-              style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}
-            >
-              <Image
-                src={lightbox.src.replace('w=700', 'w=1200')}
-                alt={lightbox.label}
-                fill
-                quality={90}
-                sizes="90vw"
-                className="object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
-                <p className="text-white font-playfair text-xl">{lightbox.label}</p>
-                <p className="text-white/60 font-poppins text-sm">{lightbox.cat}</p>
-              </div>
-              <button
-                onClick={() => setLightbox(null)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors text-lg"
-                aria-label="Close lightbox"
-              >
-                ✕
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <Image
+              src={img.src}
+              alt={img.label}
+              fill
+              className="object-cover sepia-[20%] saturate-50 transition-transform duration-[1.5s] group-hover:scale-110 ease-[cubic-bezier(0.25,1,0.5,1)]"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            {/* Elegant dark overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/90 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
+
+            <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-10 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
+              <p className="text-[9px] uppercase tracking-[0.3em] font-sans text-[#D4AF37] mb-2">
+                {img.cat}
+              </p>
+              <h3 className="text-2xl md:text-4xl font-serif text-[#FAF8F5] italic tracking-wide">
+                {img.label}
+              </h3>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-12 right-12 z-20 hidden md:flex items-center gap-4 text-[#FAF8F5]/50 mix-blend-difference">
+        <span className="text-[10px] uppercase tracking-widest font-sans">Scroll horizontally</span>
+        <div className="w-12 h-[1px] bg-[#D4AF37]" />
+      </div>
     </section>
   );
 }

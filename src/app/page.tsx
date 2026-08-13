@@ -13,7 +13,7 @@ import Services from '@/components/Services';
 import About from '@/components/About';
 import WhyUs from '@/components/WhyUs';
 import Gallery from '@/components/Gallery';
-import Pricing from '@/components/Pricing';
+import ServiceWizard from '@/components/ServiceWizard';
 import Team from '@/components/Team';
 import Testimonials from '@/components/Testimonials';
 
@@ -157,27 +157,7 @@ export default function HomePage() {
             <div className="absolute -bottom-20 -left-20 w-[40rem] h-[40rem] border border-brand-taupe/5 rounded-full opacity-40"></div>
           </div>
 
-          {/* Navbar */}
-          <nav className="absolute top-0 w-full z-40 flex items-center justify-between p-6 md:px-12 md:py-8 text-brand-cream">
-            <div className="text-xl md:text-2xl font-serif tracking-widest uppercase cursor-pointer" data-cursor="HOME">
-              The Salon
-            </div>
 
-            <div className="hidden md:flex space-x-12 text-[10px] uppercase tracking-[0.2em] font-medium">
-              <a href="#about" className="hover:text-brand-beige transition-colors" data-cursor="EXPLORE">About</a>
-              <a href="#services" className="hover:text-brand-beige transition-colors" data-cursor="EXPLORE">Services</a>
-              <a href="#projects" className="hover:text-brand-beige transition-colors" data-cursor="EXPLORE">Projects</a>
-              <a href="#contact" className="hover:text-brand-beige transition-colors" data-cursor="EXPLORE">Contact</a>
-            </div>
-
-            <button className="flex items-center space-x-3 text-[10px] uppercase tracking-widest group" data-cursor="MENU">
-              <span className="hidden md:block">Menu</span>
-              <div className="w-8 flex flex-col items-end space-y-[3px]">
-                <span className="w-full h-[1px] bg-brand-cream group-hover:w-1/2 transition-all duration-300"></span>
-                <span className="w-2/3 h-[1px] bg-brand-cream group-hover:w-full transition-all duration-300"></span>
-              </div>
-            </button>
-          </nav>
 
           {/* Hero Section */}
           <section className="relative w-full h-[90vh] md:h-screen flex items-center justify-center overflow-hidden">
@@ -312,7 +292,7 @@ export default function HomePage() {
           <About />
           <WhyUs />
           <Gallery />
-          <Pricing />
+          <ServiceWizard />
           <Team />
           <Testimonials />
 

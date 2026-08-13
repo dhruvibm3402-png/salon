@@ -104,7 +104,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${playfairDisplay.variable} ${cormorant.variable} ${poppins.variable} ${inter.variable}`}
     >
-      <body className="bg-white text-[#2C2C2C] antialiased overflow-x-hidden">
+      <body className="font-sans bg-[#0c0c0c] text-white antialiased overflow-x-hidden">
         {children}
       </body>
     </html>
